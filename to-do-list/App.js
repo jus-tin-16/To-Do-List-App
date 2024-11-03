@@ -1,20 +1,238 @@
+import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Pressable, Modal, TextInput, Button, FlatList,KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { useFonts } from "expo-font";
+import { Inter_700Bold, Inter_200ExtraLight, Inter_900Black, Inter_500Medium, Inter_600SemiBold } from "@expo-google-fonts/inter";
+import { Ionicons } from '@expo/vector-icons';
+import { Dropdown } from 'react-native-element-dropdown';
+import Task from './components/Tasks';
 
 export default function App() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [task, setTask] = useState('');
+  const [tasks, setTasks] = useState([]);
+  const [value, setValue] = useState(null);
+
+  const [fontsLoaded] = useFonts({
+    Inter_700Bold,
+    Inter_200ExtraLight,
+    Inter_900Black,
+    Inter_500Medium,
+    Inter_600SemiBold
+  });
+
+  if (!fontsLoaded) {
+    return <Text>Loading fonts...</Text>;
+  }
+
+  const date = new Date()
+ 
+  const addTask = () => {
+    setTasks([...tasks, task]);
+    setTask('');
+  };
+
+  const deleteTask = (taskToDelete) => {
+    setTasks(tasks.filter(task => task !== taskToDelete));
+  };
+
+  const priority = [
+    { p: 'Level 1', val1: 'Level 1' },
+    { p: 'Level 2', val1: 'Level 2' },
+    { p: 'Level 3', val1: 'Level 3' },
+    // Add more tags as needed
+  ];
+
+  const status = [
+    { s: 'Not started', val2: 'Not started' },
+    { s: 'In progress', val2: 'In progress' },
+    { s: 'Completed', val2: 'Completed' },
+    // Add more tags as needed
+  ];
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <KeyboardAvoidingView
+    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}style={styles.container}>
       <StatusBar style="auto" />
-    </View>
+      <View style={styles.wrapper}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <Text style={styles.title}>To-Do List App</Text>
+        </TouchableWithoutFeedback>
+            <View style={styles.listwrapper}>
+              <Text style={styles.dateHeading}>{date.toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</Text>
+              <View>
+                <FlatList 
+                  data={tasks} 
+                  renderItem={({ item }) => <Task task={item} delTask={deleteTask}/>}
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              </View>
+            </View>
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            >
+            <View style={styles.centeredView}>
+              <View style={styles.modalView}>
+                <Pressable
+                    style={[styles.button, styles.buttonClose]}
+                    onPress={() => setModalVisible(!modalVisible)}>
+                  <Ionicons name="close" size={32} color="#FED9B7" />
+                </Pressable>
+                <View>
+                  <TextInput
+                    style={styles.inputTask}
+                    onChangeText={setTask}
+                    value={task}
+                  />
+                  <Text style={styles.tasklabel}>Task Name</Text>
+                </View>
+                <View style={styles.tags}>
+                  <Text style={styles.labeltags}>Level of Priority</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    data={priority}
+                    labelField="p"
+                    valueField="value"
+                    placeholder="Select"
+                    value={value}
+                    onChange={item => {
+                      setValue(item.value);
+                    }}
+                  />
+                </View>
+                <View style={styles.tags}>
+                  <Text style={styles.labeltags}>Status</Text>
+                  <Dropdown
+                    style={styles.dropdown}
+                    data={status}
+                    labelField="s"
+                    valueField="value"
+                    placeholder="Select"
+                    value={value}
+                    onChange={item => {
+                      setValue(item.value);
+                    }}
+                  />
+                </View>
+                <Button title='Add Task' onPress={addTask} backgroundColor={'#00AFB9'}/>
+              </View>
+            </View>
+          </Modal>
+          <Pressable 
+            style={styles.addtask} 
+            onPress={() => setModalVisible(true)}>
+            <View style={styles.addbutton}>
+              <Ionicons name="add" size={48} color={'#fff'}/>
+            </View>
+            <Text style={styles.addlabel}>Add Task</Text>
+          </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F9F9EB',
+  },
+  wrapper: {
+    flex: 1,
+    paddingTop: 50,
+    alignItems:  'center',
+  },
+  title: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 32,
+    color: '#F07167',
+  },
+  listwrapper: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#FDFCDC',
+    width: 358,
+    elevation: 10,
+    shadowColor: '#000',
+    borderRadius: 10,
+  },
+  dateHeading: {
+    fontFamily: 'Inter_900Black',
+    fontSize:  24,
+    color: '#00AFB9',
+  },
+  centeredView: {
+    flex: 1,
+    padding: 50,
+    alignItems: 'center',
+  },
+  modalView: {
+    justifyContent: 'space-between',
+    margin: 20,
+    width: 358,
+    height: 352,
+    padding: 15,
+    backgroundColor: '#FDFCDC',
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    alignItems: 'flex-end',
+  },
+  inputTask: {
+    borderColor: '#0081A7',
+    borderBottomWidth: 2.5,
+    fontSize: 32,
+  },
+  tasklabel: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 24,
+    color: '#0081A7',
+  },
+  tags: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  labeltags: {
+    fontFamily: 'Inter_600SemiBold',
+    fontSize: 18,
+    color: '#0081A7',
+  },
+  dropdown: {
+    height: 30,
+    width: 125,
+    borderWidth: 2,
+    borderColor: '#0081A7',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  addbutton: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#00AFB9',
+    borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  addlabel: {
+    fontFamily: 'Inter_500Medium',
+    fontSize: 18,
+    color: '#0081A7',
+    padding: 5,
+  },
+  addtask: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
+    marginBottom: 50,
+    alignItems: 'center',
   },
 });
