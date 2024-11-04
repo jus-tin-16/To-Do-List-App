@@ -40,14 +40,13 @@ export default function App() {
     setTasks(tasks.filter(task => task !== taskToDelete));
   };
 
-  //Level of Priority Dropdown
+  //Level of Priority
   const priority = [
     { p: 'Level 1', value: 'Level 1' },
     { p: 'Level 2', value: 'Level 2' },
     { p: 'Level 3', value: 'Level 3' },
   ];
 
-  //Status dropdown
   const status = [
     { s: 'Not started', value: 'Not started' },
     { s: 'In progress', value: 'In progress' },
@@ -60,20 +59,19 @@ export default function App() {
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.wrapper}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss()}> {/*Close Keyboard when clicked outside the input*/}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss()}>
         <Text style={styles.title}>To-Do List App</Text>
         </TouchableWithoutFeedback>
             <View style={styles.listwrapper}>
-              <Text style={styles.dateHeading}>{date.toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</Text> {/*Date today*/}
+              <Text style={styles.dateHeading}>{date.toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</Text>
               <View>
                 <FlatList 
                   data={tasks} 
-                  renderItem={({ item }) => <Task task={item} delTask={deleteTask} />}  {/*Display list*/}
+                  renderItem={({ item }) => <Task task={item} delTask={deleteTask} />}
                   keyExtractor={(item, index) => index.toString()}
                 />
               </View>
             </View>
-          {/*Display Modal*/}
           <Modal
             animationType="slide"
             transparent={true}
@@ -127,7 +125,6 @@ export default function App() {
               </View>
             </View>
           </Modal>
-          {/*Click to open the modal*/}
           <Pressable 
             style={styles.addtask} 
             onPress={() => setModalVisible(true)}>
