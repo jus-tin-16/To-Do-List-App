@@ -11,10 +11,10 @@ export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [task, setTask] = useState('');
   const [tasks, setTasks] = useState([]);
-  const [editTask, setEditTask] = useState(null)
   const [value1, setValue1] = useState(null);
   const [value2, setValue2] = useState(null);
 
+  // add font
   const [fontsLoaded] = useFonts({
     Inter_700Bold,
     Inter_200ExtraLight,
@@ -23,8 +23,10 @@ export default function App() {
     Inter_600SemiBold
   });
 
+  //variable date
   const date = new Date()
  
+  //function to add task
   const addTask = () => {
     Keyboard.dismiss();
     setTasks([...tasks, { id: Date.now().toString(), taskName: task, p: value1, s: value2}]);
@@ -33,16 +35,19 @@ export default function App() {
     setValue2(null);
   };
 
+  //function to delete task
   const deleteTask = (taskToDelete) => {
     setTasks(tasks.filter(task => task !== taskToDelete));
   };
 
+  //Level of Priority Dropdown
   const priority = [
     { p: 'Level 1', value: 'Level 1' },
     { p: 'Level 2', value: 'Level 2' },
     { p: 'Level 3', value: 'Level 3' },
   ];
 
+  //Status dropdown
   const status = [
     { s: 'Not started', value: 'Not started' },
     { s: 'In progress', value: 'In progress' },
@@ -55,19 +60,20 @@ export default function App() {
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.wrapper}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss()}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss()}> {/*Close Keyboard when clicked outside the input*/}
         <Text style={styles.title}>To-Do List App</Text>
         </TouchableWithoutFeedback>
             <View style={styles.listwrapper}>
-              <Text style={styles.dateHeading}>{date.toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</Text>
+              <Text style={styles.dateHeading}>{date.toLocaleDateString('en-us', { weekday:"long", year:"numeric", month:"short", day:"numeric"})}</Text> {/*Date today*/}
               <View>
                 <FlatList 
                   data={tasks} 
-                  renderItem={({ item }) => <Task task={item} delTask={deleteTask} />}
+                  renderItem={({ item }) => <Task task={item} delTask={deleteTask} />}  {/*Display list*/}
                   keyExtractor={(item, index) => index.toString()}
                 />
               </View>
             </View>
+          {/*Display Modal*/}
           <Modal
             animationType="slide"
             transparent={true}
@@ -121,6 +127,7 @@ export default function App() {
               </View>
             </View>
           </Modal>
+          {/*Click to open the modal*/}
           <Pressable 
             style={styles.addtask} 
             onPress={() => setModalVisible(true)}>
