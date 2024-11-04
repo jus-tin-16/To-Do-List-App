@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Pressable, Modal, TextInput, Button, FlatList,KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, Text, View, Pressable, Modal, TextInput, Button, FlatList, KeyboardAvoidingView, Platform, Keyboard, TouchableWithoutFeedback } from 'react-native';
 import { useFonts } from "expo-font";
 import { Inter_700Bold, Inter_200ExtraLight, Inter_900Black, Inter_500Medium, Inter_600SemiBold } from "@expo-google-fonts/inter";
 import { Ionicons } from '@expo/vector-icons';
@@ -11,7 +11,9 @@ export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [task, setTask] = useState('');
   const [tasks, setTasks] = useState([]);
-  const [value, setValue] = useState(null);
+  const [editTask, setEditTask] = useState(null)
+  const [value1, setValue1] = useState(null);
+  const [value2, setValue2] = useState(null);
 
   const [fontsLoaded] = useFonts({
     Inter_700Bold,
@@ -21,15 +23,14 @@ export default function App() {
     Inter_600SemiBold
   });
 
-  if (!fontsLoaded) {
-    return <Text>Loading fonts...</Text>;
-  }
-
   const date = new Date()
  
   const addTask = () => {
-    setTasks([...tasks, task]);
+    Keyboard.dismiss();
+    setTasks([...tasks, { id: Date.now().toString(), taskName: task, p: value1, s: value2}]);
     setTask('');
+    setValue1(null);
+    setValue2(null);
   };
 
   const deleteTask = (taskToDelete) => {
@@ -37,16 +38,15 @@ export default function App() {
   };
 
   const priority = [
-    { p: 'Level 1', val1: 'Level 1' },
-    { p: 'Level 2', val1: 'Level 2' },
-    { p: 'Level 3', val1: 'Level 3' },
-    // Add more tags as needed
+    { p: 'Level 1', value: 'Level 1' },
+    { p: 'Level 2', value: 'Level 2' },
+    { p: 'Level 3', value: 'Level 3' },
   ];
 
   const status = [
-    { s: 'Not started', val2: 'Not started' },
-    { s: 'In progress', val2: 'In progress' },
-    { s: 'Completed', val2: 'Completed' },
+    { s: 'Not started', value: 'Not started' },
+    { s: 'In progress', value: 'In progress' },
+    { s: 'Completed', value: 'Completed' },
     // Add more tags as needed
   ];
 
@@ -55,7 +55,7 @@ export default function App() {
     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}style={styles.container}>
       <StatusBar style="auto" />
       <View style={styles.wrapper}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss()}>
         <Text style={styles.title}>To-Do List App</Text>
         </TouchableWithoutFeedback>
             <View style={styles.listwrapper}>
@@ -63,7 +63,7 @@ export default function App() {
               <View>
                 <FlatList 
                   data={tasks} 
-                  renderItem={({ item }) => <Task task={item} delTask={deleteTask}/>}
+                  renderItem={({ item }) => <Task task={item} delTask={deleteTask} />}
                   keyExtractor={(item, index) => index.toString()}
                 />
               </View>
@@ -84,6 +84,7 @@ export default function App() {
                   <TextInput
                     style={styles.inputTask}
                     onChangeText={setTask}
+                    placeholder='Enter Task Name'
                     value={task}
                   />
                   <Text style={styles.tasklabel}>Task Name</Text>
@@ -91,28 +92,28 @@ export default function App() {
                 <View style={styles.tags}>
                   <Text style={styles.labeltags}>Level of Priority</Text>
                   <Dropdown
-                    style={styles.dropdown}
+                    style={styles.dropdown1}
                     data={priority}
                     labelField="p"
                     valueField="value"
                     placeholder="Select"
-                    value={value}
+                    value={value1}
                     onChange={item => {
-                      setValue(item.value);
+                      setValue1(item.value);
                     }}
                   />
                 </View>
                 <View style={styles.tags}>
                   <Text style={styles.labeltags}>Status</Text>
                   <Dropdown
-                    style={styles.dropdown}
+                    style={styles.dropdown2}
                     data={status}
                     labelField="s"
                     valueField="value"
                     placeholder="Select"
-                    value={value}
+                    value={value2}
                     onChange={item => {
-                      setValue(item.value);
+                      setValue2(item.value);
                     }}
                   />
                 </View>
@@ -206,11 +207,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#0081A7',
   },
-  dropdown: {
+  dropdown1: {
     height: 30,
     width: 125,
-    borderWidth: 2,
-    borderColor: '#0081A7',
+    backgroundColor: '#F07167',
+    borderRadius: 8,
+    paddingHorizontal: 8,
+  },
+  dropdown2: {
+    height: 30,
+    width: 125,
+    backgroundColor: '#0081A7',
     borderRadius: 8,
     paddingHorizontal: 8,
   },
